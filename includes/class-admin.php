@@ -86,8 +86,8 @@ class Insurance_CRM_SMTP_Admin {
             'provider_preset' => sanitize_text_field($_POST['icsm_provider_preset'])
         );
         
-        // Validate settings
-        $errors = Insurance_CRM_SMTP_Mailer::validate_settings($settings);
+        // Validate settings (don't require password if one is already saved)
+        $errors = Insurance_CRM_SMTP_Mailer::validate_settings($settings, false);
         
         if (!empty($errors)) {
             add_settings_error('icsm_settings', 'validation_error', implode('<br>', $errors), 'error');
@@ -103,9 +103,11 @@ class Insurance_CRM_SMTP_Admin {
         update_option('icsm_from_name', $settings['from_name']);
         update_option('icsm_provider_preset', $settings['provider_preset']);
         
-        // Encrypt and save password
-        $plugin = Insurance_CRM_SMTP::get_instance();
-        $plugin->encrypt_and_save_password($settings['password']);
+        // Only encrypt and save password if it's not empty
+        if (!empty($settings['password'])) {
+            $plugin = Insurance_CRM_SMTP::get_instance();
+            $plugin->encrypt_and_save_password($settings['password']);
+        }
         
         // Update SMTP active status
         $active = isset($_POST['icsm_smtp_active']) ? true : false;

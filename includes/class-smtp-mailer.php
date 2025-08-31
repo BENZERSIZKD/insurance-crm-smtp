@@ -137,7 +137,7 @@ class Insurance_CRM_SMTP_Mailer {
         );
     }
     
-    public static function validate_settings($settings) {
+    public static function validate_settings($settings, $require_password = true) {
         $errors = array();
         
         if (empty($settings['host'])) {
@@ -152,8 +152,12 @@ class Insurance_CRM_SMTP_Mailer {
             $errors[] = __('SMTP Username is required', 'insurance-crm-smtp');
         }
         
-        if (empty($settings['password'])) {
-            $errors[] = __('SMTP Password is required', 'insurance-crm-smtp');
+        // Only require password if explicitly requested or if no password is stored
+        if ($require_password && empty($settings['password'])) {
+            $existing_password = get_option('icsm_smtp_password');
+            if (empty($existing_password)) {
+                $errors[] = __('SMTP Password is required', 'insurance-crm-smtp');
+            }
         }
         
         if (!empty($settings['from_email']) && !is_email($settings['from_email'])) {

@@ -99,9 +99,22 @@ if (!defined('ABSPATH')) {
                     <label for="icsm_smtp_password"><?php _e('Password', 'insurance-crm-smtp'); ?></label>
                 </th>
                 <td>
+                    <?php 
+                    $has_password = !empty(get_option('icsm_smtp_password'));
+                    $password_placeholder = $has_password 
+                        ? __('Password saved - enter new password to change', 'insurance-crm-smtp')
+                        : __('Enter your SMTP password', 'insurance-crm-smtp');
+                    ?>
                     <input type="password" id="icsm_smtp_password" name="icsm_smtp_password" 
-                           value="" class="regular-text" placeholder="<?php _e('Enter password to change', 'insurance-crm-smtp'); ?>" />
-                    <p class="description"><?php _e('Password is stored encrypted for security.', 'insurance-crm-smtp'); ?></p>
+                           value="" class="regular-text" placeholder="<?php echo esc_attr($password_placeholder); ?>" />
+                    <?php if ($has_password): ?>
+                        <p class="description">
+                            <span class="dashicons dashicons-yes-alt" style="color: #00a32a;"></span>
+                            <?php _e('Password is saved and encrypted. Leave empty to keep current password.', 'insurance-crm-smtp'); ?>
+                        </p>
+                    <?php else: ?>
+                        <p class="description"><?php _e('Password will be stored encrypted for security.', 'insurance-crm-smtp'); ?></p>
+                    <?php endif; ?>
                 </td>
             </tr>
             

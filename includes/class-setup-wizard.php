@@ -11,17 +11,69 @@ class Insurance_CRM_SMTP_Setup_Wizard {
     
     public static function init() {
         add_action('admin_post_icsm_wizard_step', array(__CLASS__, 'handle_wizard_step'));
+        add_action('admin_post_icsm_wizard_complete', array(__CLASS__, 'handle_wizard_complete'));
     }
     
     public static function display_wizard() {
-        $step = isset($_GET['step']) ? intval($_GET['step']) : 1;
-        $max_steps = 4;
-        
-        if ($step > $max_steps) {
-            $step = $max_steps;
+        // Use single-page wizard instead of multi-step
+        include ICSM_PLUGIN_DIR . 'admin/setup-wizard-single.php';
+    }
+    
+    public static function handle_wizard_complete() {
+        if (!wp_verify_nonce($_POST['wizard_nonce'], 'icsm_wizard_complete')) {
+            wp_die(__('Security check failed', 'insurance-crm-smtp'));
         }
         
-        include ICSM_PLUGIN_DIR . 'admin/setup-wizard.php';
+        // Validate and save all settings at once
+        $provider = isset($_POST['provider']) && !empty($_POST['provider']) 
+            ? sanitize_text_field($_POST['provider']) 
+            : 'manual';
+        
+        $smtp_settings = array(
+            'host' => sanitize_text_field($_POST['smtp_host']),
+            'port' => intval($_POST['smtp_port']),
+            'security' => sanitize_text_field($_POST['smtp_security']),
+            'username' => sanitize_text_field($_POST['smtp_username']),
+            'password' => $_POST['smtp_password'],
+            'from_email' => sanitize_email($_POST['from_email']),
+            'from_name' => sanitize_text_field($_POST['from_name'])
+        );
+        
+        // Validate settings
+        $errors = Insurance_CRM_SMTP_Mailer::validate_settings($smtp_settings);
+        
+        if (!empty($errors)) {
+            $redirect_url = admin_url('admin.php?page=insurance-crm-smtp-wizard&error=' . urlencode(implode(', ', $errors)));
+        } else {
+            // Save provider preset
+            update_option('icsm_provider_preset', $provider);
+            
+            // Save SMTP settings
+            update_option('icsm_smtp_host', $smtp_settings['host']);
+            update_option('icsm_smtp_port', $smtp_settings['port']);
+            update_option('icsm_smtp_security', $smtp_settings['security']);
+            update_option('icsm_smtp_username', $smtp_settings['username']);
+            update_option('icsm_from_email', $smtp_settings['from_email']);
+            update_option('icsm_from_name', $smtp_settings['from_name']);
+            
+            // Encrypt and save password
+            $plugin = Insurance_CRM_SMTP::get_instance();
+            $plugin->encrypt_and_save_password($smtp_settings['password']);
+            
+            // Activate SMTP
+            update_option('icsm_smtp_active', true);
+            
+            // Send test email if provided
+            $test_email = sanitize_email($_POST['test_email']);
+            if (!empty($test_email) && is_email($test_email)) {
+                Insurance_CRM_SMTP_Mailer::send_test_email($test_email);
+            }
+            
+            $redirect_url = admin_url('admin.php?page=insurance-crm-smtp-wizard&success=1');
+        }
+        
+        wp_redirect($redirect_url);
+        exit;
     }
     
     public static function handle_wizard_step() {
