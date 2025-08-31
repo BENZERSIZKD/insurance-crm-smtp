@@ -104,9 +104,11 @@ if (!defined('ABSPATH')) {
                     $password_placeholder = $has_password 
                         ? __('Password saved - enter new password to change', 'insurance-crm-smtp')
                         : __('Enter your SMTP password', 'insurance-crm-smtp');
+                    $password_value = $has_password ? '••••••••' : '';
                     ?>
                     <input type="password" id="icsm_smtp_password" name="icsm_smtp_password" 
-                           value="" class="regular-text" placeholder="<?php echo esc_attr($password_placeholder); ?>" />
+                           value="<?php echo esc_attr($password_value); ?>" class="regular-text" 
+                           placeholder="<?php echo esc_attr($password_placeholder); ?>" />
                     <?php if ($has_password): ?>
                         <p class="description">
                             <span class="dashicons dashicons-yes-alt" style="color: #00a32a;"></span>
@@ -204,6 +206,83 @@ jQuery(document).ready(function($) {
                 $('#icsm_smtp_security').val(settings.security);
             }
         }
+    });
+    
+    // Password field handler
+    var hasPassword = <?php echo !empty(get_option('icsm_smtp_password')) ? 'true' : 'false'; ?>;
+    var passwordField = $('#icsm_smtp_password');
+    var isPasswordChanged = false;
+    
+    if (hasPassword) {
+        // When user clicks on password field with saved password, clear it for new input
+        passwordField.on('focus', function() {
+            if (!isPasswordChanged && $(this).val() === '••••••••') {
+                $(this).val('');
+                $(this).attr('placeholder', 'Enter new password or leave empty to keep current');
+            }
+        });
+        
+        // Track if password was actually changed
+        passwordField.on('input', function() {
+            isPasswordChanged = true;
+        });
+        
+        // If user leaves field empty after focusing, restore dots
+        passwordField.on('blur', function() {
+            if (!isPasswordChanged && $(this).val() === '') {
+                $(this).val('••••••••');
+            }
+        });
+    }
+    
+    // Test connection handler
+    var testButton = $('input[name="test_connection"]');
+    var originalText = testButton.val();
+    
+    testButton.on('click', function(e) {
+        e.preventDefault();
+        
+        // Check required fields
+        var host = $('#icsm_smtp_host').val().trim();
+        var port = $('#icsm_smtp_port').val().trim();
+        var username = $('#icsm_smtp_username').val().trim();
+        var password = $('#icsm_smtp_password').val().trim();
+        
+        if (!host || !port || !username) {
+            alert('<?php _e('Please fill in all required fields (Host, Port, Username)', 'insurance-crm-smtp'); ?>');
+            return false;
+        }
+        
+        // For saved password, we don't need to validate password field
+        if (!hasPassword && !password) {
+            alert('<?php _e('Password is required for testing connection', 'insurance-crm-smtp'); ?>');
+            return false;
+        }
+        
+        // If password field shows dots, user hasn't changed it, so clear it for form submission
+        if (password === '••••••••') {
+            passwordField.val('');
+        }
+        
+        // Change button state
+        testButton.val('<?php _e('Testing Connection...', 'insurance-crm-smtp'); ?>').prop('disabled', true);
+        
+        // Submit form for test connection
+        var form = testButton.closest('form');
+        var formData = form.serialize() + '&test_connection=1';
+        
+        // Submit via AJAX would be better, but for now we'll do regular form submission
+        // Reset button after a delay if no page reload happens
+        setTimeout(function() {
+            testButton.val(originalText).prop('disabled', false);
+            // Restore password dots if needed
+            if (hasPassword && passwordField.val() === '') {
+                passwordField.val('••••••••');
+            }
+        }, 5000);
+        
+        // Allow form submission
+        form.submit();
     });
 });
 </script>

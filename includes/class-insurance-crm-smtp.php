@@ -184,7 +184,7 @@ class Insurance_CRM_SMTP {
         return base64_encode($encrypted);
     }
     
-    private function decrypt_password($encrypted_password) {
+    public function decrypt_password($encrypted_password) {
         if (empty($encrypted_password)) {
             return '';
         }

@@ -86,6 +86,11 @@ class Insurance_CRM_SMTP_Admin {
             'provider_preset' => sanitize_text_field($_POST['icsm_provider_preset'])
         );
         
+        // If password field contains dots, it means user didn't change it
+        if ($settings['password'] === '••••••••') {
+            $settings['password'] = '';
+        }
+        
         // Validate settings (don't require password if one is already saved)
         $errors = Insurance_CRM_SMTP_Mailer::validate_settings($settings, false);
         
@@ -127,12 +132,34 @@ class Insurance_CRM_SMTP_Admin {
         $username = sanitize_text_field($_POST['icsm_smtp_username']);
         $password = $_POST['icsm_smtp_password'];
         
+        // Validate required fields
+        if (empty($host) || empty($port) || empty($username)) {
+            add_settings_error('icsm_settings', 'connection_error', __('Please fill in all required fields (Host, Port, Username)', 'insurance-crm-smtp'), 'error');
+            return array('success' => false, 'message' => 'Missing required fields');
+        }
+        
+        // If password field is empty or contains dots, try to use saved password
+        if (empty($password) || $password === '••••••••') {
+            $saved_password = get_option('icsm_smtp_password');
+            if (!empty($saved_password)) {
+                // Decrypt saved password
+                $plugin = Insurance_CRM_SMTP::get_instance();
+                $password = $plugin->decrypt_password($saved_password);
+            }
+        }
+        
+        // Check if we still don't have a password
+        if (empty($password)) {
+            add_settings_error('icsm_settings', 'connection_error', __('Password is required for testing connection', 'insurance-crm-smtp'), 'error');
+            return array('success' => false, 'message' => 'Missing password');
+        }
+        
         $result = Insurance_CRM_SMTP_Mailer::test_connection($host, $port, $security, $username, $password);
         
         if ($result['success']) {
-            add_settings_error('icsm_settings', 'connection_success', $result['message'], 'updated');
+            add_settings_error('icsm_settings', 'connection_success', __('✅ Test OK! Connection successful', 'insurance-crm-smtp'), 'updated');
         } else {
-            add_settings_error('icsm_settings', 'connection_error', $result['message'], 'error');
+            add_settings_error('icsm_settings', 'connection_error', __('❌ Test NOT OK! ', 'insurance-crm-smtp') . $result['message'], 'error');
         }
         
         return $result;
