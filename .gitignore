@@ -1,0 +1,41 @@
+# Build artifacts
+/node_modules/
+/vendor/
+*.log
+*.cache
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+/tmp/
+
+# Plugin development
+.wp-cli.yml
+wp-config.php
+wp-content/
+wp-admin/
+wp-includes/
+
+# Language compilation
+*.mo
+
+# Backup files
+*.bak
+*.backup
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
