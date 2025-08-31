@@ -7,11 +7,6 @@ jQuery(document).ready(function($) {
     
     // Ensure a provider is always selected in the wizard
     if ($('input[name="provider"]').length > 0) {
-        // If no provider is selected, select manual by default
-        if (!$('input[name="provider"]:checked').length) {
-            $('input[name="provider"][value="manual"]').prop('checked', true);
-        }
-        
         // Handle provider card clicks
         $('.provider-option').on('click', function() {
             $(this).find('input[type="radio"]').prop('checked', true).trigger('change');
@@ -106,29 +101,14 @@ jQuery(document).ready(function($) {
         }
     });
     
-    // Simple form validation - just ensure provider is selected for wizard step 2
+    // Simple form submission handler for visual feedback
     $('form').on('submit', function(e) {
         const $form = $(this);
+        const $button = $form.find('.button-primary');
         
-        // Wizard step 2 provider selection - simplified validation
-        if ($form.find('input[name="provider"]').length > 0) {
-            const selectedProvider = $form.find('input[name="provider"]:checked').val();
-            if (!selectedProvider) {
-                // If nothing selected, auto-select manual and continue
-                $form.find('input[name="provider"][value="manual"]').prop('checked', true);
-            }
-            
-            // Add visual feedback
-            const $button = $form.find('.button-primary');
-            $button.prop('disabled', true).val('Processing...');
-        }
-        
-        // Settings form validation
-        if ($form.find('#icsm_smtp_host').length > 0) {
-            if (!validateSMTPSettings()) {
-                e.preventDefault();
-                return false;
-            }
+        // Add visual feedback without preventing submission
+        if ($button.length) {
+            $button.val('Processing...');
         }
     });
     

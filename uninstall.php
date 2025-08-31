@@ -9,7 +9,9 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
     exit;
 }
 
-// Include plugin files to access uninstall method
+// Include required plugin files to access uninstall method
+require_once plugin_dir_path(__FILE__) . 'includes/class-logger.php';
+require_once plugin_dir_path(__FILE__) . 'includes/class-rate-limiter.php';
 require_once plugin_dir_path(__FILE__) . 'includes/class-insurance-crm-smtp.php';
 
 // Call the uninstall method
