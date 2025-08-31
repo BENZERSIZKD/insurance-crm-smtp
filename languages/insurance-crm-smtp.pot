@@ -1,0 +1,144 @@
+# Insurance CRM SMTP Language Template
+# This file contains all translatable strings
+
+msgid ""
+msgstr ""
+"Project-Id-Version: Insurance CRM SMTP 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-01 12:00+0000\n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: WordPress\n"
+
+# Main plugin strings
+msgid "Insurance CRM SMTP"
+msgstr ""
+
+msgid "InsuranceCRM SMTP"
+msgstr ""
+
+# Admin menu items
+msgid "Settings"
+msgstr ""
+
+msgid "Logs"
+msgstr ""
+
+msgid "Test Email"
+msgstr ""
+
+# Setup wizard
+msgid "Insurance CRM SMTP Setup Wizard"
+msgstr ""
+
+msgid "Setup Wizard"
+msgstr ""
+
+msgid "Welcome"
+msgstr ""
+
+msgid "Provider"
+msgstr ""
+
+msgid "Configuration"
+msgstr ""
+
+msgid "Test & Complete"
+msgstr ""
+
+# Settings page
+msgid "Insurance CRM SMTP Settings"
+msgstr ""
+
+msgid "SMTP Status"
+msgstr ""
+
+msgid "Enable SMTP"
+msgstr ""
+
+msgid "Use SMTP for sending emails"
+msgstr ""
+
+msgid "Email Provider"
+msgstr ""
+
+msgid "Manual Configuration"
+msgstr ""
+
+msgid "SMTP Host"
+msgstr ""
+
+msgid "SMTP Port"
+msgstr ""
+
+msgid "Security"
+msgstr ""
+
+msgid "Username"
+msgstr ""
+
+msgid "Password"
+msgstr ""
+
+msgid "From Email"
+msgstr ""
+
+msgid "From Name"
+msgstr ""
+
+# Status messages
+msgid "SMTP is disabled"
+msgstr ""
+
+msgid "SMTP not configured"
+msgstr ""
+
+msgid "SMTP is active and configured"
+msgstr ""
+
+msgid "Connection successful!"
+msgstr ""
+
+msgid "Connection failed!"
+msgstr ""
+
+# Test email
+msgid "Test Email from Insurance CRM SMTP"
+msgstr ""
+
+msgid "This is a test email sent from your WordPress site using Insurance CRM SMTP plugin."
+msgstr ""
+
+# Error messages
+msgid "SMTP Host is required"
+msgstr ""
+
+msgid "Valid SMTP Port is required"  
+msgstr ""
+
+msgid "SMTP Username is required"
+msgstr ""
+
+msgid "SMTP Password is required"
+msgstr ""
+
+msgid "From Email must be a valid email address"
+msgstr ""
+
+# Logging
+msgid "Email sent successfully"
+msgstr ""
+
+msgid "Failed to send email"
+msgstr ""
+
+msgid "Test email sent successfully!"
+msgstr ""
+
+msgid "Failed to send test email. Please check your SMTP settings and logs."
+msgstr ""
