@@ -65,11 +65,11 @@ $error = isset($_GET['error']) ? sanitize_text_field($_GET['error']) : '';
                     <div class="provider-options">
                         <?php 
                         $providers = Insurance_CRM_SMTP_Mailer::get_email_providers();
-                        $current_provider = get_option('icsm_provider_preset', '');
+                        $current_provider = get_option('icsm_provider_preset', 'manual'); // Default to manual
                         ?>
                         
                         <label class="provider-option">
-                            <input type="radio" name="provider" value="gmail" <?php checked($current_provider, 'gmail'); ?> required>
+                            <input type="radio" name="provider" value="gmail" <?php checked($current_provider, 'gmail'); ?>>
                             <div class="provider-card">
                                 <h3>Gmail</h3>
                                 <p>smtp.gmail.com:587 (TLS)</p>
@@ -77,7 +77,7 @@ $error = isset($_GET['error']) ? sanitize_text_field($_GET['error']) : '';
                         </label>
                         
                         <label class="provider-option">
-                            <input type="radio" name="provider" value="outlook" <?php checked($current_provider, 'outlook'); ?> required>
+                            <input type="radio" name="provider" value="outlook" <?php checked($current_provider, 'outlook'); ?>>
                             <div class="provider-card">
                                 <h3>Outlook/Hotmail</h3>
                                 <p>smtp.live.com:587 (STARTTLS)</p>
@@ -85,7 +85,7 @@ $error = isset($_GET['error']) ? sanitize_text_field($_GET['error']) : '';
                         </label>
                         
                         <label class="provider-option">
-                            <input type="radio" name="provider" value="yahoo" <?php checked($current_provider, 'yahoo'); ?> required>
+                            <input type="radio" name="provider" value="yahoo" <?php checked($current_provider, 'yahoo'); ?>>
                             <div class="provider-card">
                                 <h3>Yahoo</h3>
                                 <p>smtp.mail.yahoo.com:587 (TLS)</p>
@@ -93,7 +93,7 @@ $error = isset($_GET['error']) ? sanitize_text_field($_GET['error']) : '';
                         </label>
                         
                         <label class="provider-option">
-                            <input type="radio" name="provider" value="yandex" <?php checked($current_provider, 'yandex'); ?> required>
+                            <input type="radio" name="provider" value="yandex" <?php checked($current_provider, 'yandex'); ?>>
                             <div class="provider-card">
                                 <h3>Yandex</h3>
                                 <p>smtp.yandex.com:465 (SSL)</p>
@@ -101,7 +101,7 @@ $error = isset($_GET['error']) ? sanitize_text_field($_GET['error']) : '';
                         </label>
                         
                         <label class="provider-option">
-                            <input type="radio" name="provider" value="manual" <?php checked($current_provider, 'manual'); ?> required>
+                            <input type="radio" name="provider" value="manual" <?php checked($current_provider, 'manual'); ?>>
                             <div class="provider-card">
                                 <h3><?php _e('Manual Configuration', 'insurance-crm-smtp'); ?></h3>
                                 <p><?php _e('Configure SMTP settings manually', 'insurance-crm-smtp'); ?></p>
@@ -358,17 +358,27 @@ $error = isset($_GET['error']) ? sanitize_text_field($_GET['error']) : '';
     cursor: pointer;
 }
 
+.provider-option input[type="radio"] {
+    display: none; /* Hide radio buttons, use cards for selection */
+}
+
 .provider-card {
     border: 2px solid #ddd;
     border-radius: 4px;
     padding: 20px;
     text-align: center;
-    transition: border-color 0.2s;
+    transition: all 0.2s ease;
+}
+
+.provider-card:hover {
+    border-color: #0073aa;
+    background: #f8f9fa;
 }
 
 .provider-option input[type="radio"]:checked + .provider-card {
     border-color: #0073aa;
     background: #f0f6fc;
+    box-shadow: 0 0 0 1px #0073aa;
 }
 
 .provider-card h3 {

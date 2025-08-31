@@ -5,6 +5,28 @@
 jQuery(document).ready(function($) {
     'use strict';
     
+    // Ensure a provider is always selected in the wizard
+    if ($('input[name="provider"]').length > 0) {
+        // If no provider is selected, select manual by default
+        if (!$('input[name="provider"]:checked').length) {
+            $('input[name="provider"][value="manual"]').prop('checked', true);
+        }
+        
+        // Handle provider card clicks
+        $('.provider-option').on('click', function() {
+            $(this).find('input[type="radio"]').prop('checked', true).trigger('change');
+        });
+        
+        // Update visual state when selection changes
+        $('input[name="provider"]').on('change', function() {
+            $('.provider-card').removeClass('selected');
+            $(this).closest('.provider-option').find('.provider-card').addClass('selected');
+        });
+        
+        // Initialize visual state
+        $('input[name="provider"]:checked').trigger('change');
+    }
+    
     // Provider preset handler
     $('#icsm_provider_preset').change(function() {
         const provider = $(this).val();
@@ -84,17 +106,16 @@ jQuery(document).ready(function($) {
         }
     });
     
-    // Form submission validation
+    // Simple form validation - just ensure provider is selected for wizard step 2
     $('form').on('submit', function(e) {
         const $form = $(this);
         
-        // Wizard step 2 provider selection validation
+        // Wizard step 2 provider selection - simplified validation
         if ($form.find('input[name="provider"]').length > 0) {
             const selectedProvider = $form.find('input[name="provider"]:checked').val();
             if (!selectedProvider) {
-                e.preventDefault();
-                showNotice('Please select an email provider to continue.', 'error');
-                return false;
+                // If nothing selected, auto-select manual and continue
+                $form.find('input[name="provider"][value="manual"]').prop('checked', true);
             }
             
             // Add visual feedback
@@ -257,6 +278,8 @@ jQuery(document).ready(function($) {
             }
             .selected {
                 background-color: #f0f6fc !important;
+                border-color: #0073aa !important;
+                box-shadow: 0 0 0 1px #0073aa !important;
             }
         `)
         .appendTo('head');
