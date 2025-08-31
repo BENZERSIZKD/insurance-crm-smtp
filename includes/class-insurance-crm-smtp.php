@@ -32,11 +32,6 @@ class Insurance_CRM_SMTP {
         if ($this->is_smtp_configured() && $this->is_smtp_active()) {
             add_action('phpmailer_init', array($this, 'configure_phpmailer'));
         }
-        
-        // Check if setup wizard should run
-        if (get_option('icsm_show_setup_wizard', true)) {
-            add_action('admin_notices', array($this, 'setup_wizard_notice'));
-        }
     }
     
     public function add_admin_menu() {
@@ -84,6 +79,15 @@ class Insurance_CRM_SMTP {
             'manage_options',
             'insurance-crm-smtp-queue',
             array('Insurance_CRM_SMTP_Admin', 'display_queue_page')
+        );
+        
+        add_submenu_page(
+            'insurance-crm-smtp',
+            __('Setup Wizard', 'insurance-crm-smtp'),
+            __('Setup Wizard', 'insurance-crm-smtp'),
+            'manage_options',
+            'insurance-crm-smtp-wizard',
+            array('Insurance_CRM_SMTP_Setup_Wizard', 'display_wizard')
         );
     }
     
@@ -158,17 +162,6 @@ class Insurance_CRM_SMTP {
             $error_message = is_wp_error($error) ? $error->get_error_message() : 'Unknown error';
             Insurance_CRM_SMTP_Logger::log_email_failure($log_id, $error_message);
         });
-    }
-    
-    public function setup_wizard_notice() {
-        if (current_user_can('manage_options')) {
-            echo '<div class="notice notice-info is-dismissible">';
-            echo '<p>' . sprintf(
-                __('Welcome to Insurance CRM SMTP! Please <a href="%s">run the setup wizard</a> to configure your email settings.', 'insurance-crm-smtp'),
-                admin_url('admin.php?page=insurance-crm-smtp-wizard')
-            ) . '</p>';
-            echo '</div>';
-        }
     }
     
     private function is_smtp_configured() {

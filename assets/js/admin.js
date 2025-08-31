@@ -84,19 +84,31 @@ jQuery(document).ready(function($) {
         }
     });
     
-    // Wizard navigation enhancement
-    $('.wizard-navigation .button-primary').on('click', function() {
-        const $button = $(this);
-        const $form = $button.closest('form');
+    // Form submission validation
+    $('form').on('submit', function(e) {
+        const $form = $(this);
         
-        // Add loading spinner
-        $button.prop('disabled', true);
-        $button.html('<span class="icsm-spinner"></span>' + $button.text());
+        // Wizard step 2 provider selection validation
+        if ($form.find('input[name="provider"]').length > 0) {
+            const selectedProvider = $form.find('input[name="provider"]:checked').val();
+            if (!selectedProvider) {
+                e.preventDefault();
+                showNotice('Please select an email provider to continue.', 'error');
+                return false;
+            }
+            
+            // Add visual feedback
+            const $button = $form.find('.button-primary');
+            $button.prop('disabled', true).val('Processing...');
+        }
         
-        // Allow form to submit naturally
-        setTimeout(function() {
-            $form.submit();
-        }, 100);
+        // Settings form validation
+        if ($form.find('#icsm_smtp_host').length > 0) {
+            if (!validateSMTPSettings()) {
+                e.preventDefault();
+                return false;
+            }
+        }
     });
     
     // Email validation helper
@@ -212,27 +224,6 @@ jQuery(document).ready(function($) {
         
         return isValid;
     }
-    
-    // Form submission validation
-    $('form').on('submit', function(e) {
-        if ($(this).find('#icsm_smtp_host').length > 0) {
-            // This is the settings form
-            if (!validateSMTPSettings()) {
-                e.preventDefault();
-                return false;
-            }
-        }
-        
-        // Wizard step 2 provider selection validation
-        if ($(this).find('input[name="provider"]').length > 0) {
-            const selectedProvider = $(this).find('input[name="provider"]:checked').val();
-            if (!selectedProvider) {
-                e.preventDefault();
-                showNotice('Please select an email provider to continue.', 'error');
-                return false;
-            }
-        }
-    });
     
     // Initialize tooltips if available
     if (typeof tippy !== 'undefined') {

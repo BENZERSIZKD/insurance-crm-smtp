@@ -10,19 +10,7 @@ if (!defined('ABSPATH')) {
 class Insurance_CRM_SMTP_Setup_Wizard {
     
     public static function init() {
-        add_action('admin_menu', array(__CLASS__, 'add_wizard_page'));
         add_action('admin_post_icsm_wizard_step', array(__CLASS__, 'handle_wizard_step'));
-    }
-    
-    public static function add_wizard_page() {
-        add_submenu_page(
-            null, // No parent menu (hidden)
-            __('Insurance CRM SMTP Setup Wizard', 'insurance-crm-smtp'),
-            __('Setup Wizard', 'insurance-crm-smtp'),
-            'manage_options',
-            'insurance-crm-smtp-wizard',
-            array(__CLASS__, 'display_wizard')
-        );
     }
     
     public static function display_wizard() {
@@ -111,9 +99,6 @@ class Insurance_CRM_SMTP_Setup_Wizard {
                 
                 // Activate SMTP
                 update_option('icsm_smtp_active', true);
-                
-                // Hide setup wizard
-                update_option('icsm_show_setup_wizard', false);
                 
                 $redirect_url = admin_url('admin.php?page=insurance-crm-smtp&wizard_complete=1');
                 break;
