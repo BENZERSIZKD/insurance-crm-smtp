@@ -63,10 +63,30 @@ class Insurance_CRM_SMTP_Setup_Wizard {
             // Activate SMTP
             update_option('icsm_smtp_active', true);
             
-            // Send test email if provided
+            // Send test email if provided (optional, don't fail setup if it fails)
             $test_email = sanitize_email($_POST['test_email']);
             if (!empty($test_email) && is_email($test_email)) {
-                Insurance_CRM_SMTP_Mailer::send_test_email($test_email);
+                try {
+                    // Re-initialize plugin to ensure SMTP hooks are active
+                    $plugin = Insurance_CRM_SMTP::get_instance();
+                    
+                    // Remove any existing phpmailer_init hooks to avoid conflicts
+                    remove_all_actions('phpmailer_init');
+                    
+                    // Add our SMTP configuration hook with high priority
+                    add_action('phpmailer_init', array($plugin, 'configure_phpmailer'), 10, 1);
+                    
+                    $test_result = Insurance_CRM_SMTP_Mailer::send_test_email($test_email);
+                    if ($test_result) {
+                        $redirect_url .= '&test_email_sent=1';
+                    } else {
+                        $redirect_url .= '&test_email_failed=1';
+                    }
+                } catch (Exception $e) {
+                    // Log the error but don't fail the setup
+                    Insurance_CRM_SMTP_Logger::log('error', 'Test email failed during setup: ' . $e->getMessage());
+                    $redirect_url .= '&test_email_failed=1';
+                }
             }
             
             $redirect_url = admin_url('admin.php?page=insurance-crm-smtp-wizard&success=1');

@@ -98,15 +98,33 @@ class Insurance_CRM_SMTP_Mailer {
             $message .= "\n" . sprintf(__('Site: %s', 'insurance-crm-smtp'), get_site_url());
         }
         
-        $result = wp_mail($to_email, $subject, $message);
-        
-        if ($result) {
-            Insurance_CRM_SMTP_Logger::log('info', sprintf(__('Test email sent successfully to %s', 'insurance-crm-smtp'), $to_email));
-        } else {
-            Insurance_CRM_SMTP_Logger::log('error', sprintf(__('Failed to send test email to %s', 'insurance-crm-smtp'), $to_email));
+        // Add error handling for wp_mail failures
+        try {
+            // Clear any previous errors
+            global $phpmailer;
+            if (isset($phpmailer)) {
+                $phpmailer->clearAllRecipients();
+                $phpmailer->clearAttachments();
+                $phpmailer->clearCustomHeaders();
+            }
+            
+            $result = wp_mail($to_email, $subject, $message);
+            
+            if ($result) {
+                Insurance_CRM_SMTP_Logger::log('info', sprintf(__('Test email sent successfully to %s', 'insurance-crm-smtp'), $to_email));
+            } else {
+                $error_msg = 'Unknown error';
+                if (isset($phpmailer) && !empty($phpmailer->ErrorInfo)) {
+                    $error_msg = $phpmailer->ErrorInfo;
+                }
+                Insurance_CRM_SMTP_Logger::log('error', sprintf(__('Failed to send test email to %s: %s', 'insurance-crm-smtp'), $to_email, $error_msg));
+            }
+            
+            return $result;
+        } catch (Exception $e) {
+            Insurance_CRM_SMTP_Logger::log('error', sprintf(__('Exception while sending test email to %s: %s', 'insurance-crm-smtp'), $to_email, $e->getMessage()));
+            return false;
         }
-        
-        return $result;
     }
     
     public static function get_smtp_status() {

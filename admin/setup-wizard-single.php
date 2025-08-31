@@ -5,6 +5,8 @@ if (!defined('ABSPATH')) {
 
 $error = isset($_GET['error']) ? sanitize_text_field($_GET['error']) : '';
 $success = isset($_GET['success']) ? true : false;
+$test_email_sent = isset($_GET['test_email_sent']) ? true : false;
+$test_email_failed = isset($_GET['test_email_failed']) ? true : false;
 
 // Get current settings for form population
 $providers = Insurance_CRM_SMTP_Mailer::get_email_providers();
@@ -23,6 +25,11 @@ $current_provider = get_option('icsm_provider_preset', 'manual');
     <?php if ($success): ?>
         <div class="notice notice-success">
             <p><?php _e('SMTP configuration completed successfully! Your email settings are now active.', 'insurance-crm-smtp'); ?></p>
+            <?php if ($test_email_sent): ?>
+                <p><?php _e('✓ Test email was sent successfully.', 'insurance-crm-smtp'); ?></p>
+            <?php elseif ($test_email_failed): ?>
+                <p><?php _e('⚠ SMTP configuration saved, but test email failed. This may be due to server restrictions or incorrect settings.', 'insurance-crm-smtp'); ?></p>
+            <?php endif; ?>
         </div>
     <?php endif; ?>
     
