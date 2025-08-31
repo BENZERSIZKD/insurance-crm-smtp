@@ -69,7 +69,7 @@ $error = isset($_GET['error']) ? sanitize_text_field($_GET['error']) : '';
                         ?>
                         
                         <label class="provider-option">
-                            <input type="radio" name="provider" value="gmail" <?php checked($current_provider, 'gmail'); ?>>
+                            <input type="radio" name="provider" value="gmail" <?php checked($current_provider, 'gmail'); ?> required>
                             <div class="provider-card">
                                 <h3>Gmail</h3>
                                 <p>smtp.gmail.com:587 (TLS)</p>
@@ -77,7 +77,7 @@ $error = isset($_GET['error']) ? sanitize_text_field($_GET['error']) : '';
                         </label>
                         
                         <label class="provider-option">
-                            <input type="radio" name="provider" value="outlook" <?php checked($current_provider, 'outlook'); ?>>
+                            <input type="radio" name="provider" value="outlook" <?php checked($current_provider, 'outlook'); ?> required>
                             <div class="provider-card">
                                 <h3>Outlook/Hotmail</h3>
                                 <p>smtp.live.com:587 (STARTTLS)</p>
@@ -85,7 +85,7 @@ $error = isset($_GET['error']) ? sanitize_text_field($_GET['error']) : '';
                         </label>
                         
                         <label class="provider-option">
-                            <input type="radio" name="provider" value="yahoo" <?php checked($current_provider, 'yahoo'); ?>>
+                            <input type="radio" name="provider" value="yahoo" <?php checked($current_provider, 'yahoo'); ?> required>
                             <div class="provider-card">
                                 <h3>Yahoo</h3>
                                 <p>smtp.mail.yahoo.com:587 (TLS)</p>
@@ -93,7 +93,7 @@ $error = isset($_GET['error']) ? sanitize_text_field($_GET['error']) : '';
                         </label>
                         
                         <label class="provider-option">
-                            <input type="radio" name="provider" value="yandex" <?php checked($current_provider, 'yandex'); ?>>
+                            <input type="radio" name="provider" value="yandex" <?php checked($current_provider, 'yandex'); ?> required>
                             <div class="provider-card">
                                 <h3>Yandex</h3>
                                 <p>smtp.yandex.com:465 (SSL)</p>
@@ -101,7 +101,7 @@ $error = isset($_GET['error']) ? sanitize_text_field($_GET['error']) : '';
                         </label>
                         
                         <label class="provider-option">
-                            <input type="radio" name="provider" value="manual" <?php checked($current_provider, 'manual'); ?>>
+                            <input type="radio" name="provider" value="manual" <?php checked($current_provider, 'manual'); ?> required>
                             <div class="provider-card">
                                 <h3><?php _e('Manual Configuration', 'insurance-crm-smtp'); ?></h3>
                                 <p><?php _e('Configure SMTP settings manually', 'insurance-crm-smtp'); ?></p>

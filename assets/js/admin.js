@@ -222,6 +222,16 @@ jQuery(document).ready(function($) {
                 return false;
             }
         }
+        
+        // Wizard step 2 provider selection validation
+        if ($(this).find('input[name="provider"]').length > 0) {
+            const selectedProvider = $(this).find('input[name="provider"]:checked').val();
+            if (!selectedProvider) {
+                e.preventDefault();
+                showNotice('Please select an email provider to continue.', 'error');
+                return false;
+            }
+        }
     });
     
     // Initialize tooltips if available

@@ -51,6 +51,11 @@ class Insurance_CRM_SMTP_Setup_Wizard {
                 
             case 2:
                 // Step 2: Provider selection
+                if (!isset($_POST['provider']) || empty($_POST['provider'])) {
+                    $redirect_url = admin_url('admin.php?page=insurance-crm-smtp-wizard&step=2&error=' . urlencode(__('Please select an email provider to continue.', 'insurance-crm-smtp')));
+                    break;
+                }
+                
                 $provider = sanitize_text_field($_POST['provider']);
                 update_option('icsm_provider_preset', $provider);
                 
