@@ -49,6 +49,31 @@ class Insurance_CRM_SMTP_Admin {
         include ICSM_PLUGIN_DIR . 'admin/test-page.php';
     }
     
+    public static function display_queue_page() {
+        // Handle queue actions
+        if (isset($_POST['action']) && wp_verify_nonce($_POST['queue_nonce'], 'icsm_queue_action')) {
+            switch ($_POST['action']) {
+                case 'process_queue':
+                    Insurance_CRM_SMTP_Queue::process_queue(50);
+                    add_settings_error('icsm_queue', 'queue_processed', __('Queue processed successfully!', 'insurance-crm-smtp'), 'updated');
+                    break;
+                case 'clear_queue':
+                    Insurance_CRM_SMTP_Queue::clear_queue();
+                    add_settings_error('icsm_queue', 'queue_cleared', __('Queue cleared successfully!', 'insurance-crm-smtp'), 'updated');
+                    break;
+                case 'retry_failed':
+                    $count = Insurance_CRM_SMTP_Queue::retry_failed_emails();
+                    add_settings_error('icsm_queue', 'emails_retried', sprintf(__('Retrying %d failed emails', 'insurance-crm-smtp'), $count), 'updated');
+                    break;
+            }
+        }
+        
+        $stats = Insurance_CRM_SMTP_Queue::get_queue_stats();
+        $rate_limit_status = Insurance_CRM_SMTP_Rate_Limiter::get_rate_limit_status();
+        
+        include ICSM_PLUGIN_DIR . 'admin/queue-page.php';
+    }
+    
     private static function save_settings() {
         $settings = array(
             'host' => sanitize_text_field($_POST['icsm_smtp_host']),

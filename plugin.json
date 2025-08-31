@@ -1,0 +1,151 @@
+{
+    "name": "Insurance CRM SMTP",
+    "version": "1.0.0",
+    "description": "Professional WordPress SMTP plugin with advanced email delivery features",
+    "author": "BenzerSizKod",
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://github.com/benzersizkod/insurance-crm-smtp",
+    "requires": {
+        "wordpress": "5.0",
+        "php": "7.4"
+    },
+    "keywords": [
+        "smtp",
+        "email",
+        "mail",
+        "phpmailer",
+        "gmail",
+        "outlook",
+        "yahoo",
+        "yandex",
+        "queue",
+        "rate-limiting",
+        "logging"
+    ],
+    "features": [
+        "Setup Wizard",
+        "Popular Provider Presets",
+        "Comprehensive Logging",
+        "Email Queue Management",
+        "Rate Limiting",
+        "Security Features",
+        "Performance Optimizations",
+        "Admin Interface",
+        "Test Email Functionality"
+    ],
+    "supported_providers": {
+        "gmail": {
+            "name": "Gmail",
+            "host": "smtp.gmail.com",
+            "port": 587,
+            "security": "tls",
+            "requires_app_password": true
+        },
+        "outlook": {
+            "name": "Outlook/Hotmail",
+            "host": "smtp.live.com",
+            "port": 587,
+            "security": "starttls"
+        },
+        "yahoo": {
+            "name": "Yahoo Mail",
+            "host": "smtp.mail.yahoo.com",
+            "port": 587,
+            "security": "tls",
+            "requires_app_password": true
+        },
+        "yandex": {
+            "name": "Yandex",
+            "host": "smtp.yandex.com",
+            "port": 465,
+            "security": "ssl"
+        }
+    },
+    "database_tables": [
+        "wp_insurance_crm_smtp_logs",
+        "wp_insurance_crm_smtp_queue"
+    ],
+    "options": [
+        "icsm_smtp_host",
+        "icsm_smtp_port",
+        "icsm_smtp_security",
+        "icsm_smtp_username",
+        "icsm_smtp_password",
+        "icsm_from_email",
+        "icsm_from_name",
+        "icsm_smtp_active",
+        "icsm_provider_preset",
+        "icsm_show_setup_wizard",
+        "icsm_db_version",
+        "icsm_rate_limit_enabled",
+        "icsm_rate_limit_emails",
+        "icsm_rate_limit_window"
+    ],
+    "hooks": {
+        "actions": [
+            "icsm_email_sent",
+            "icsm_email_failed",
+            "icsm_settings_updated"
+        ],
+        "filters": [
+            "icsm_smtp_settings",
+            "icsm_log_retention_days",
+            "icsm_max_retries",
+            "icsm_rate_limit_settings"
+        ]
+    },
+    "admin_pages": [
+        {
+            "slug": "insurance-crm-smtp",
+            "title": "Settings",
+            "capability": "manage_options"
+        },
+        {
+            "slug": "insurance-crm-smtp-logs",
+            "title": "Logs",
+            "capability": "manage_options"
+        },
+        {
+            "slug": "insurance-crm-smtp-test",
+            "title": "Test Email",
+            "capability": "manage_options"
+        },
+        {
+            "slug": "insurance-crm-smtp-queue",
+            "title": "Queue",
+            "capability": "manage_options"
+        },
+        {
+            "slug": "insurance-crm-smtp-wizard",
+            "title": "Setup Wizard",
+            "capability": "manage_options"
+        }
+    ],
+    "cron_jobs": [
+        {
+            "hook": "icsm_process_queue",
+            "schedule": "hourly",
+            "description": "Process email queue"
+        }
+    ],
+    "security": {
+        "password_encryption": true,
+        "nonce_verification": true,
+        "input_sanitization": true,
+        "capability_checks": true,
+        "rate_limiting": true
+    },
+    "performance": {
+        "database_indexes": true,
+        "auto_cleanup": true,
+        "caching_support": true,
+        "queue_system": true,
+        "retry_mechanism": true
+    },
+    "development": {
+        "debug_mode": true,
+        "logging": true,
+        "error_reporting": true,
+        "connection_testing": true
+    }
+}

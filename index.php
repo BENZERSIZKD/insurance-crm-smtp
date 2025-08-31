@@ -28,6 +28,8 @@ require_once ICSM_PLUGIN_DIR . 'includes/class-admin.php';
 require_once ICSM_PLUGIN_DIR . 'includes/class-setup-wizard.php';
 require_once ICSM_PLUGIN_DIR . 'includes/class-logger.php';
 require_once ICSM_PLUGIN_DIR . 'includes/class-database.php';
+require_once ICSM_PLUGIN_DIR . 'includes/class-queue.php';
+require_once ICSM_PLUGIN_DIR . 'includes/class-rate-limiter.php';
 
 // Initialize the plugin
 function insurance_crm_smtp_init() {
@@ -37,6 +39,9 @@ function insurance_crm_smtp_init() {
     // Initialize setup wizard
     Insurance_CRM_SMTP_Setup_Wizard::init();
     
+    // Initialize queue system
+    Insurance_CRM_SMTP_Queue::init();
+    
     // Enqueue admin scripts
     add_action('admin_enqueue_scripts', array('Insurance_CRM_SMTP_Admin', 'enqueue_admin_scripts'));
 }
@@ -45,7 +50,10 @@ function insurance_crm_smtp_init() {
 add_action('plugins_loaded', 'insurance_crm_smtp_init');
 
 // Activation hook
-register_activation_hook(__FILE__, array('Insurance_CRM_SMTP_Database', 'create_tables'));
+register_activation_hook(__FILE__, function() {
+    Insurance_CRM_SMTP_Database::create_tables();
+    Insurance_CRM_SMTP_Queue::create_queue_table();
+});
 
 // Deactivation hook
 register_deactivation_hook(__FILE__, array('Insurance_CRM_SMTP', 'deactivate'));

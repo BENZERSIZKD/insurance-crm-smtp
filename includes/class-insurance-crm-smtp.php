@@ -76,6 +76,15 @@ class Insurance_CRM_SMTP {
             'insurance-crm-smtp-test',
             array('Insurance_CRM_SMTP_Admin', 'display_test_page')
         );
+        
+        add_submenu_page(
+            'insurance-crm-smtp',
+            __('Email Queue', 'insurance-crm-smtp'),
+            __('Queue', 'insurance-crm-smtp'),
+            'manage_options',
+            'insurance-crm-smtp-queue',
+            array('Insurance_CRM_SMTP_Admin', 'display_queue_page')
+        );
     }
     
     public function admin_init() {
@@ -96,6 +105,12 @@ class Insurance_CRM_SMTP {
     }
     
     public function configure_phpmailer($phpmailer) {
+        // Check rate limiting first
+        if (Insurance_CRM_SMTP_Rate_Limiter::is_rate_limited()) {
+            Insurance_CRM_SMTP_Logger::log('warning', 'Email sending blocked due to rate limiting');
+            return; // Don't configure SMTP, will fall back to default
+        }
+        
         $smtp_host = get_option('icsm_smtp_host');
         $smtp_port = get_option('icsm_smtp_port', 587);
         $smtp_security = get_option('icsm_smtp_security', 'tls');
@@ -130,7 +145,19 @@ class Insurance_CRM_SMTP {
         }
         
         // Log the email attempt
-        Insurance_CRM_SMTP_Logger::log_email_attempt($phpmailer);
+        $log_id = Insurance_CRM_SMTP_Logger::log_email_attempt($phpmailer);
+        
+        // Add custom action for successful send
+        add_action('wp_mail_succeeded', function($mail_data) use ($log_id) {
+            Insurance_CRM_SMTP_Logger::log_email_success($log_id);
+            Insurance_CRM_SMTP_Rate_Limiter::record_email_sent();
+        });
+        
+        // Add custom action for failed send
+        add_action('wp_mail_failed', function($error) use ($log_id) {
+            $error_message = is_wp_error($error) ? $error->get_error_message() : 'Unknown error';
+            Insurance_CRM_SMTP_Logger::log_email_failure($log_id, $error_message);
+        });
     }
     
     public function setup_wizard_notice() {
@@ -200,9 +227,20 @@ class Insurance_CRM_SMTP {
         delete_option('icsm_provider_preset');
         delete_option('icsm_show_setup_wizard');
         delete_option('icsm_db_version');
+        delete_option('icsm_rate_limit_enabled');
+        delete_option('icsm_rate_limit_emails');
+        delete_option('icsm_rate_limit_window');
         
         // Drop tables
-        $table_name = $wpdb->prefix . 'insurance_crm_smtp_logs';
-        $wpdb->query("DROP TABLE IF EXISTS {$table_name}");
+        $logs_table = $wpdb->prefix . 'insurance_crm_smtp_logs';
+        $queue_table = $wpdb->prefix . 'insurance_crm_smtp_queue';
+        $wpdb->query("DROP TABLE IF EXISTS {$logs_table}");
+        $wpdb->query("DROP TABLE IF EXISTS {$queue_table}");
+        
+        // Clear scheduled events
+        wp_clear_scheduled_hook('icsm_process_queue');
+        
+        // Clear rate limit transients
+        Insurance_CRM_SMTP_Rate_Limiter::clear_rate_limits();
     }
 }
